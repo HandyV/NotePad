@@ -40,4 +40,9 @@
     <string name="error_title">Error</string>
     <string name="error_message">Error loading note</string>
     <string name="nothing_to_save">There is nothing to save</string>
+
+
+    <string name="search_hint">搜索笔记标题或内容...</string>
+    <string name="search_no_results">没有找到相关笔记</string>
+    <string name="search_results">搜索结果: %d 条笔记</string>
 </resources>

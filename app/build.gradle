@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.android.notepad"
-        minSdkVersion 11
+        minSdkVersion 19
         targetSdkVersion 23
 
         testApplicationId "com.example.android.notepad.tests"
@@ -20,4 +20,5 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
 }

@@ -63,7 +63,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * The database version
      */
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     /**
      * A projection map used to select columns from the database
@@ -156,6 +156,15 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE);
 
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_CATEGORY,
+                NotePad.Notes.COLUMN_NAME_CATEGORY);
+
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_COLOR,
+                NotePad.Notes.COLUMN_NAME_COLOR);
+
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_TAGS,
+                NotePad.Notes.COLUMN_NAME_TAGS);
+
         /*
          * Creates an initializes a projection map for handling Live Folders
          */
@@ -196,9 +205,13 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER"
+                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"
+                   + NotePad.Notes.COLUMN_NAME_CATEGORY + " TEXT,"    // 添加分类字段
+                   + NotePad.Notes.COLUMN_NAME_COLOR + " INTEGER DEFAULT 0,"    // 添加颜色字段
+                   + NotePad.Notes.COLUMN_NAME_TAGS + " TEXT"         // 添加标签字段
                    + ");");
        }
+
 
        /**
         *
@@ -209,16 +222,28 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         */
        @Override
        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+           Log.d(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 
-           // Logs that the database is being upgraded
-           Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                   + newVersion + ", which will destroy all old data");
+           if (oldVersion < 2) {
+               // 升级到版本2，添加分类字段
+               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME
+                       + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_CATEGORY + " TEXT");
+               Log.d(TAG, "Added category column");
+           }
 
-           // Kills the table and existing data
-           db.execSQL("DROP TABLE IF EXISTS notes");
+           if (oldVersion < 3) {
+               // 升级到版本3，添加颜色字段
+               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME
+                       + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_COLOR + " INTEGER DEFAULT 0");
+               Log.d(TAG, "Added color column");
+           }
 
-           // Recreates the database with a new version
-           onCreate(db);
+           if (oldVersion < 4) {
+               // 升级到版本4，添加标签字段
+               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME
+                       + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_TAGS + " TEXT");
+               Log.d(TAG, "Added tags column");
+           }
        }
    }
 
@@ -238,6 +263,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
        // Assumes that any failures will be reported by a thrown exception.
        return true;
    }
+
+
 
    /**
     * This method is called when a client calls
@@ -538,6 +565,13 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         // If the values map doesn't contain note text, sets the value to an empty string.
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
+        }
+
+        if (values.containsKey(NotePad.Notes.COLUMN_NAME_COLOR) == false) {
+            values.put(NotePad.Notes.COLUMN_NAME_COLOR, NotePad.Notes.COLOR_DEFAULT); // 默认白色
+        }
+        if (values.containsKey(NotePad.Notes.COLUMN_NAME_CATEGORY) == false) {
+            values.put(NotePad.Notes.COLUMN_NAME_CATEGORY, ""); // 默认空分类
         }
 
         // Opens the database object in "write" mode.

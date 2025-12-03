@@ -150,5 +150,31 @@ public final class NotePad {
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
+        /**
+         * Column name for the note category
+         * <P>Type: TEXT</P>
+         */
+        public static final String COLUMN_NAME_CATEGORY = "category";
+
+        /**
+         * Column name for the note color
+         * <P>Type: INTEGER</P>
+         */
+        public static final String COLUMN_NAME_COLOR = "color";
+
+        /**
+         * Column name for the note tags
+         * <P>Type: TEXT</P>
+         */
+        public static final String COLUMN_NAME_TAGS = "tags";
+
+        // =========== 添加颜色常量 ===========
+        public static final int COLOR_DEFAULT = 0;
+        public static final int COLOR_RED = 1;
+        public static final int COLOR_BLUE = 2;
+        public static final int COLOR_GREEN = 3;
+        public static final int COLOR_YELLOW = 4;
+        public static final int COLOR_PURPLE = 5;
+
     }
 }
